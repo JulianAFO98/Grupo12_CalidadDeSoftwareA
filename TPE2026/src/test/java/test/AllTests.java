@@ -14,7 +14,11 @@ import org.junit.runners.Suite.SuiteClasses;
 	TestDaoGuardar.class,
 	TestDaoCargar.class,
 	TestDaoEliminar.class,
-	TestDaoActualizar.class
+	TestDaoActualizar.class,
+	TestAmbulanciaMock.class,
+	TestAmbulanciaEstados.class,
+	TestAmbulanciaConcurrencia.class,
+	TestRetornoAutomatico.class
 })
 public class AllTests {
 
