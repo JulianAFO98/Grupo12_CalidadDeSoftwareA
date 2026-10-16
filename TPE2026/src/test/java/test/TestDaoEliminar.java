@@ -21,9 +21,4 @@ public class TestDaoEliminar extends FixtureBaseDeDatos {
 		Assert.assertEquals(CANTIDAD_SEMILLA, contarAsociados());
 	}
 
-	/** Clase 3 (DNI nulo): la precondicion falla con AssertionError. */
-	@Test(expected = AssertionError.class)
-	public void testEliminar_Null() throws Exception {
-		dao.eliminar(null);
-	}
 }

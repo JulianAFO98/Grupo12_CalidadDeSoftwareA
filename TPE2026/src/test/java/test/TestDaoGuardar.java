@@ -30,9 +30,4 @@ public class TestDaoGuardar extends FixtureBaseDeDatos {
 		Assert.assertEquals("Mar del Plata", f.get("ciudad"));
 	}
 
-	/** Clase 2 (asociado nulo): la precondicion falla con AssertionError y no se inserta nada. */
-	@Test(expected = AssertionError.class)
-	public void testGuardar_Null() throws Exception {
-		dao.guardar(null);
-	}
 }

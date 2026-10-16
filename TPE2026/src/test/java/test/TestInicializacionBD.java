@@ -73,22 +73,34 @@ public class TestInicializacionBD extends FixtureBaseDeDatos {
 
 	/**
 	 * Clase 2 (la base no existe): luego de eliminar Grupo_7, una operacion del DAO lanza
-	 * SQLException. El fixture restaura la base al finalizar.
+	 * SQLException porque no queda base seleccionada (codigo MySQL 1046). El fixture restaura
+	 * la base al finalizar.
 	 */
-	@Test(expected = SQLException.class)
+	@Test
 	public void testOperarSinBase() throws Exception {
 		ejecutarSQL("DROP DATABASE Grupo_7");
-		dao.cargarBD();
+		try {
+			dao.cargarBD();
+			Assert.fail("Se esperaba SQLException al operar sin la base Grupo_7.");
+		} catch (SQLException e) {
+			assertCodigoError("Se esperaba error de base no seleccionada.", ER_NO_DB_ERROR, e);
+		}
 	}
 
 	/**
 	 * Clase 4 (la tabla no existe): luego de eliminar Asociados, una operacion del DAO lanza
-	 * SQLException. El fixture restaura la tabla al finalizar.
+	 * SQLException de tabla inexistente (codigo MySQL 1146). El fixture restaura la tabla al
+	 * finalizar.
 	 */
-	@Test(expected = SQLException.class)
+	@Test
 	public void testOperarSinTabla() throws Exception {
 		ejecutarSQL("DROP TABLE Asociados");
-		dao.cargarBD();
+		try {
+			dao.cargarBD();
+			Assert.fail("Se esperaba SQLException al operar sin la tabla Asociados.");
+		} catch (SQLException e) {
+			assertCodigoError("Se esperaba error de tabla inexistente.", ER_NO_SUCH_TABLE, e);
+		}
 	}
 
 	/**

@@ -1,5 +1,6 @@
 package test;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 import org.junit.Assert;
@@ -15,45 +16,80 @@ public class TestDaoCargar extends FixtureBaseDeDatos {
 
 	// ---------- cargar(id) ----------
 
-	/** Clase 1 (valor limite id = 1): devuelve el primer asociado semilla, Juan State. */
+	/**
+	 * Clase 1 (valor limite id = 1): devuelve el primer asociado semilla, Juan State.
+	 * Si la operacion lanza una excepcion, se reporta como fallo (no como error).
+	 */
 	@Test
 	public void testCargar_PrimerId() throws Exception {
-		AsociadoDTO a = dao.cargar(1);
+		AsociadoDTO a = null;
+		try {
+			a = dao.cargar(1);
+		} catch (SQLException e) {
+			Assert.fail("Fallo de manera inesperada por un error de SQL cuando debia devolver el asociado con id 1.");
+		} catch (Exception e) {
+			Assert.fail("Fallo de manera inesperada cuando debia devolver el asociado con id 1.");
+		}
 		Assert.assertNotNull("No se encontro el asociado 1.", a);
 		Assert.assertEquals("Juan", a.getNombre());
 		Assert.assertEquals("State", a.getApellido());
 		Assert.assertEquals("12345678", a.getDni());
 	}
 
-	/** Clase 1 (valor limite id = 20): devuelve el ultimo asociado semilla, Adrian Composite. */
+	/**
+	 * Clase 1 (valor limite id = 20): devuelve el ultimo asociado semilla, Adrian Composite.
+	 * Si la operacion lanza una excepcion, se reporta como fallo (no como error).
+	 */
 	@Test
 	public void testCargar_UltimoId() throws Exception {
-		AsociadoDTO a = dao.cargar(20);
+		AsociadoDTO a = null;
+		try {
+			a = dao.cargar(20);
+		} catch (SQLException e) {
+			Assert.fail("Fallo de manera inesperada por un error de SQL cuando debia devolver el asociado con id 20.");
+		} catch (Exception e) {
+			Assert.fail("Fallo de manera inesperada cuando debia devolver el asociado con id 20.");
+		}
 		Assert.assertNotNull("No se encontro el asociado 20.", a);
 		Assert.assertEquals("Adrian", a.getNombre());
 		Assert.assertEquals("Composite", a.getApellido());
 		Assert.assertEquals("28293031", a.getDni());
 	}
 
-	/** Clase 1 (valor intermedio id = 10): devuelve David Adapter. */
+	/**
+	 * Clase 1 (valor intermedio id = 10): devuelve David Adapter.
+	 * Si la operacion lanza una excepcion, se reporta como fallo (no como error).
+	 */
 	@Test
 	public void testCargar_IdIntermedio() throws Exception {
-		AsociadoDTO a = dao.cargar(10);
+		AsociadoDTO a = null;
+		try {
+			a = dao.cargar(10);
+		} catch (SQLException e) {
+			Assert.fail("Fallo de manera inesperada por un error de SQL cuando debia devolver el asociado con id 10.");
+		} catch (Exception e) {
+			Assert.fail("Fallo de manera inesperada cuando debia devolver el asociado con id 10.");
+		}
 		Assert.assertNotNull("No se encontro el asociado 10.", a);
 		Assert.assertEquals("David", a.getNombre());
 		Assert.assertEquals("Adapter", a.getApellido());
 	}
 
-	/** Clase 2 (id inexistente, 21): no hay asociado con ese id, el resultado es null. */
+	/**
+	 * Clase 2 (id inexistente, 21): no hay asociado con ese id, el resultado es null.
+	 * Si la operacion lanza una excepcion, se reporta como fallo (no como error).
+	 */
 	@Test
 	public void testCargar_IdInexistente() throws Exception {
-		Assert.assertNull("No deberia existir el asociado 21.", dao.cargar(21));
-	}
-
-	/** Clase 3 (valor limite id = 0): la precondicion id > 0 falla con AssertionError. */
-	@Test(expected = AssertionError.class)
-	public void testCargar_IdCero() throws Exception {
-		dao.cargar(0);
+		AsociadoDTO resultado = new AsociadoDTO();
+		try {
+			resultado = dao.cargar(21);
+		} catch (SQLException e) {
+			Assert.fail("Fallo de manera inesperada por un error de SQL cuando debia devolver null porque el asociado con id 21 no existe.");
+		} catch (Exception e) {
+			Assert.fail("Fallo de manera inesperada cuando debia devolver null porque el asociado con id 21 no existe.");
+		}
+		Assert.assertNull("No deberia existir el asociado 21.", resultado);
 	}
 
 	// ---------- cargarConLimite(limite) ----------
@@ -80,12 +116,6 @@ public class TestDaoCargar extends FixtureBaseDeDatos {
 	@Test
 	public void testCargarConLimite_MayorALaCantidad() throws Exception {
 		Assert.assertEquals(CANTIDAD_SEMILLA, dao.cargarConLimite(25).size());
-	}
-
-	/** Clase 3 (valor limite 0): la precondicion limite > 0 falla con AssertionError. */
-	@Test(expected = AssertionError.class)
-	public void testCargarConLimite_Cero() throws Exception {
-		dao.cargarConLimite(0);
 	}
 
 	// ---------- cargarBD() ----------

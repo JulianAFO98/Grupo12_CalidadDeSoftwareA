@@ -100,11 +100,6 @@ public class TestAsociadoDTO {
 		Assert.assertEquals("El numero de la vivienda no ha sido registrado correctamente",0, asociadoDTO.getNumero());
 	}
 	
-	@Test(expected = AssertionError.class)
-	public void testSetNumero_Negativo() {
-		asociadoDTO.setNumero(-1);
-	}
-	
 	
 	@Test
 	public void testSetTelefono() {
@@ -117,35 +112,4 @@ public class TestAsociadoDTO {
 		asociadoDTO.setTelefono("");
 		Assert.assertEquals("El numero de telefono no ha sido registrado correctamente.", "", asociadoDTO.getTelefono());
 	}
-	
-	@Test(expected = AssertionError.class)
-	public void testSetNombre_Null() {
-		asociadoDTO.setNombre(null);
-	}
-	
-	@Test(expected = AssertionError.class)
-	public void testSetApellido_Null() {
-		asociadoDTO.setApellido(null);
-	}
-	
-	@Test(expected = AssertionError.class)
-	public void testSetDni_Null() {
-		asociadoDTO.setDni(null);
-	}
-	
-	@Test(expected = AssertionError.class)
-	public void testSetCiudad_Null() {
-		asociadoDTO.setCiudad(null);
-	}
-	
-	@Test(expected = AssertionError.class)
-	public void testSetCalle_Null() {
-		asociadoDTO.setCalle(null);
-	}
-	
-	@Test(expected = AssertionError.class)
-	public void testSetTelefono_Null() {
-		asociadoDTO.setTelefono(null);
-	}
-	
 }

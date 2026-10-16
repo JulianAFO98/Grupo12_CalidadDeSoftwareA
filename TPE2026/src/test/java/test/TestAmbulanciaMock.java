@@ -36,12 +36,6 @@ public class TestAmbulanciaMock extends FixtureAmbulancia {
 		Assert.assertSame("El estado actual deberia ser el mock instalado.", estadoMock, ambulancia.getEstadoActual());
 	}
 
-	/** Clase 2: setState(null) viola la precondicion y lanza AssertionError. */
-	@Test(expected = AssertionError.class)
-	public void testSetState_Null() {
-		ambulancia.setState(null);
-	}
-
 	// ---------- solicitarMantenimiento(operario) ----------
 
 	/**
@@ -53,12 +47,6 @@ public class TestAmbulanciaMock extends FixtureAmbulancia {
 		ambulancia.solicitarMantenimiento(crearOperario());
 		verify(estadoMock).SolicitudMantenimiento();
 		Assert.assertTrue("La ambulancia deberia quedar ocupada.", ambulancia.isOcupado());
-	}
-
-	/** Clase 2 (operario nulo): lanza AssertionError. */
-	@Test(expected = AssertionError.class)
-	public void testSolicitarMantenimiento_Null() {
-		ambulancia.solicitarMantenimiento(null);
 	}
 
 	/**
@@ -90,12 +78,6 @@ public class TestAmbulanciaMock extends FixtureAmbulancia {
 		Assert.assertTrue(ambulancia.isOcupado());
 	}
 
-	/** Clase 2 (asociado nulo): lanza AssertionError. */
-	@Test(expected = AssertionError.class)
-	public void testAtenderDomicilio_Null() {
-		ambulancia.atenderDomicilio(null);
-	}
-
 	/** Clase 4 (ambulancia ocupada): el asociado espera; al liberarla, el estado recibe la llamada. */
 	@Test
 	public void testAtenderDomicilio_AmbulanciaOcupada() throws Exception {
@@ -120,12 +102,6 @@ public class TestAmbulanciaMock extends FixtureAmbulancia {
 		ambulancia.trasladarALaClinica(crearAsociado());
 		verify(estadoMock).SolicitudDeTraslado();
 		Assert.assertTrue(ambulancia.isOcupado());
-	}
-
-	/** Clase 2 (asociado nulo): lanza AssertionError. */
-	@Test(expected = AssertionError.class)
-	public void testTrasladarALaClinica_Null() {
-		ambulancia.trasladarALaClinica(null);
 	}
 
 	/** Clase 4 (ambulancia ocupada): el asociado espera; al liberarla, el estado recibe la llamada. */

@@ -46,7 +46,7 @@ public class TestUnicidadDNI extends FixtureBaseDeDatos {
 	/**
 	 * Clase 2: guardar un asociado cuyo DNI ya existe (12345678, dato semilla)
 	 * lanza
-	 * SQLException por clave duplicada y no agrega filas.
+	 * SQLException por clave duplicada (codigo MySQL 1062) y no agrega filas.
 	 */
 	@Test
 	public void testGuardar_DniDuplicado() throws Exception {
@@ -54,6 +54,7 @@ public class TestUnicidadDNI extends FixtureBaseDeDatos {
 			dao.guardar(asociadoConDni("12345678"));
 			Assert.fail("Se esperaba SQLException por DNI duplicado.");
 		} catch (SQLException e) {
+			assertCodigoError("Se esperaba error de DNI duplicado.", ER_DUP_ENTRY, e);
 			Assert.assertEquals("No debio agregarse ninguna fila.", CANTIDAD_SEMILLA, contarAsociados());
 		}
 	}
@@ -61,7 +62,7 @@ public class TestUnicidadDNI extends FixtureBaseDeDatos {
 	/**
 	 * Clase 2: actualizar un asociado con un DNI que ya pertenece a otro (87654321)
 	 * lanza
-	 * SQLException y deja los datos como estaban.
+	 * SQLException por clave duplicada (codigo MySQL 1062) y deja los datos como estaban.
 	 */
 	@Test
 	public void testActualizar_DniDeOtroAsociado() throws Exception {
@@ -70,6 +71,7 @@ public class TestUnicidadDNI extends FixtureBaseDeDatos {
 			dao.actualizar(asociadoConDni("87654321"));
 			Assert.fail("Se esperaba SQLException por DNI duplicado.");
 		} catch (SQLException e) {
+			assertCodigoError("Se esperaba error de DNI duplicado.", ER_DUP_ENTRY, e);
 			Assert.assertEquals("La fila no debio modificarse.", antes, filaPorId(1));
 		}
 	}
@@ -77,10 +79,17 @@ public class TestUnicidadDNI extends FixtureBaseDeDatos {
 	/**
 	 * Clase 4 (valor limite 11): un DNI de 11 caracteres excede el VARCHAR(10) y la
 	 * base lo
-	 * rechaza con SQLException (Requiere modo SQL estricto).
+	 * rechaza con SQLException por dato demasiado largo (codigo MySQL 1406; requiere modo SQL
+	 * estricto).
 	 */
-	@Test(expected = SQLException.class)
+	@Test
 	public void testGuardar_DniDe11Caracteres() throws Exception {
-		dao.guardar(asociadoConDni("12345678901"));
+		try {
+			dao.guardar(asociadoConDni("12345678901"));
+			Assert.fail("Se esperaba SQLException: el DNI excede los 10 caracteres.");
+		} catch (SQLException e) {
+			assertCodigoError("Se esperaba error de dato demasiado largo.", ER_DATA_TOO_LONG, e);
+			Assert.assertNull("No debio guardarse el DNI.", filaPorDni("12345678901"));
+		}
 	}
 }

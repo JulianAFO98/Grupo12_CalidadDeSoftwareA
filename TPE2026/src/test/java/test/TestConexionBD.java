@@ -49,11 +49,18 @@ public class TestConexionBD extends FixtureBaseDeDatos {
 
 	/**
 	 * Clase erronea de desconexion: operar contra la base luego de cerrar la conexion debe
-	 * lanzar SQLException (el error de SQL se propaga, no se oculta).
+	 * lanzar SQLException (el error de SQL se propaga, no se oculta). Este error lo genera el
+	 * driver, no el servidor MySQL, por eso no tiene codigo de MySQL: se verifica el SQLState
+	 * estandar 08003 (conexion cerrada).
 	 */
-	@Test(expected = SQLException.class)
+	@Test
 	public void testDesconexion_OperarConConexionCerrada() throws Exception {
 		dao.cerrarConexion();
-		dao.cargarBD();
+		try {
+			dao.cargarBD();
+			Assert.fail("Se esperaba SQLException al operar con la conexion cerrada.");
+		} catch (SQLException e) {
+			Assert.assertEquals("Se esperaba error de conexion cerrada.", SQLSTATE_CONEXION_CERRADA, e.getSQLState());
+		}
 	}
 }

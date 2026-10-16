@@ -10,6 +10,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 
 import modelo.modeloDominio.personas.asociado.Asociado;
@@ -33,6 +34,21 @@ public abstract class FixtureBaseDeDatos {
 
 	/** Cantidad de registros que inserta iniciarBD() como datos semilla. */
 	protected static final int CANTIDAD_SEMILLA = 20;
+
+	/*
+	 * Codigos de error de MySQL (SQLException.getErrorCode()). Estan documentados por MySQL y
+	 * no dependen del idioma ni de la version, a diferencia del texto del mensaje.
+	 */
+	/** Clave duplicada: se viola una restriccion UNIQUE (ej: DNI repetido). */
+	protected static final int ER_DUP_ENTRY = 1062;
+	/** El dato es mas largo que la columna (ej: DNI de 11 caracteres en VARCHAR(10)). */
+	protected static final int ER_DATA_TOO_LONG = 1406;
+	/** La tabla no existe. */
+	protected static final int ER_NO_SUCH_TABLE = 1146;
+	/** No hay una base de datos seleccionada (ej: se elimino la base en uso). */
+	protected static final int ER_NO_DB_ERROR = 1046;
+	/** SQLState estandar de "conexion inexistente o cerrada" (lo genera el driver, no MySQL). */
+	protected static final String SQLSTATE_CONEXION_CERRADA = "08003";
 
 	protected BaseDeDatos bd;
 	protected DataAccessObject dao;
@@ -84,6 +100,14 @@ public abstract class FixtureBaseDeDatos {
 		Field f = BaseDeDatos.class.getDeclaredField("instancia");
 		f.setAccessible(true);
 		return (BaseDeDatos) f.get(null);
+	}
+
+	/**
+	 * Verifica que la SQLException se haya producido por el motivo esperado, comparando su
+	 * codigo de error de MySQL.
+	 */
+	protected void assertCodigoError(String mensaje, int codigoEsperado, SQLException e) {
+		Assert.assertEquals(mensaje, codigoEsperado, e.getErrorCode());
 	}
 
 	/** Ejecuta una sentencia SQL directa (DDL o DML), sin pasar por el DAO. */
