@@ -2,6 +2,7 @@ package test;
 
 import java.lang.reflect.Field;
 import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
@@ -12,6 +13,7 @@ import java.util.Map;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.BeforeClass;
 
 import modelo.modeloDominio.personas.asociado.Asociado;
 import modelo.modeloDominio.util.Domicilio;
@@ -52,6 +54,25 @@ public abstract class FixtureBaseDeDatos {
 
 	protected BaseDeDatos bd;
 	protected DataAccessObject dao;
+
+	/**
+	 * Precalienta la autenticacion en MySQL antes de las pruebas de la clase.
+	 * <p>
+	 * MySQL 8 autentica a progra_c con caching_sha2_password. Despues de reiniciar el servidor
+	 * su cache de contrasenas esta vacia, y la primera conexion sin SSL (la URL de BaseDeDatos usa
+	 * useSSL=false) necesita pedir la clave publica del servidor, cosa que el driver no permite
+	 * por defecto: falla con "Public Key Retrieval is not allowed" y BaseDeDatos queda sin
+	 * conexion. Autenticarse una vez permitiendo pedir esa clave llena la cache, y a partir de
+	 * ahi la conexion de BaseDeDatos (sin cambios en su codigo) funciona normalmente.
+	 */
+	@BeforeClass
+	public static void precalentarAutenticacion() throws SQLException {
+		try (Connection c = DriverManager.getConnection(
+				"jdbc:mysql://localhost:3306/?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true",
+				"progra_c", "progra_c")) {
+			// solo hace falta autenticarse; la conexion se cierra enseguida
+		}
+	}
 
 	/**
 	 * Prepara el escenario: obtiene la instancia de BaseDeDatos (reiniciandola si una prueba
