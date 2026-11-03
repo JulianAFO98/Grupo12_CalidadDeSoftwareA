@@ -120,15 +120,17 @@ public class TestAmbulanciaConcurrencia extends FixtureAmbulancia {
 		Operario operario = crearOperario();
 		Asociado asociado = crearAsociado();
 		CountDownLatch salida = new CountDownLatch(1);
+		CountDownLatch arrancaron = new CountDownLatch(2);
 		Thread tOperario = lanzarHilo(() -> {
-			esperar(salida);
+			esperar(salida, arrancaron);
 			ambulancia.solicitarMantenimiento(operario);
 		});
 		Thread tAsociado = lanzarHilo(() -> {
-			esperar(salida);
+			esperar(salida, arrancaron);
 			ambulancia.atenderDomicilio(asociado);
 		});
 		salida.countDown();
+		arrancaron.await();
 
 		esperarHasta("ninguno de los dos quedo esperando exactamente uno",
 				() -> (tOperario.getState() == Thread.State.WAITING) ^ (tAsociado.getState() == Thread.State.WAITING));
@@ -217,24 +219,32 @@ public class TestAmbulanciaConcurrencia extends FixtureAmbulancia {
 	// ---------- utilidades ----------
 
 	/** Lanza 5 asociados que piden atenderDomicilio() en el mismo instante (latch de salida). */
-	private List<Thread> lanzarCincoAsociadosSimultaneos() {
+	private List<Thread> lanzarCincoAsociadosSimultaneos() throws InterruptedException {
 		CountDownLatch salida = new CountDownLatch(1);
+		CountDownLatch arrancaron = new CountDownLatch(5);
 		List<Thread> hilos = new ArrayList<>();
 		for (int i = 0; i < 5; i++) {
 			hilos.add(lanzarHilo(() -> {
-				esperar(salida);
+				esperar(salida, arrancaron);
 				ambulancia.atenderDomicilio(crearAsociado());
 			}));
 		}
 		salida.countDown();
+		arrancaron.await();
 		return hilos;
 	}
 
-	private void esperar(CountDownLatch latch) {
+	/**
+	 * Espera la largada y avisa que la paso. Un hilo detenido en el latch de salida tambien figura
+	 * como WAITING: el test espera "arrancaron" para no confundirlo con un hilo que espera la
+	 * ambulancia.
+	 */
+	private void esperar(CountDownLatch salida, CountDownLatch arrancaron) {
 		try {
-			latch.await();
+			salida.await();
 		} catch (InterruptedException e) {
 			Thread.currentThread().interrupt();
 		}
+		arrancaron.countDown();
 	}
 }
